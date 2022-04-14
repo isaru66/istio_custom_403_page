@@ -1,0 +1,37 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: EnvoyFilter
+metadata:
+  name: customize-authz-response
+  namespace: istio-system
+spec:
+  workloadSelector:
+    labels:
+      istio: ingressgateway
+  configPatches:
+  - applyTo: NETWORK_FILTER
+    match:
+      context: GATEWAY
+      listener:
+        filterChain:
+          filter:
+            name: "envoy.filters.network.http_connection_manager"
+    patch:
+      operation: MERGE
+      value:
+        typed_config:
+          "@type": "type.googleapis.com/envoy.extensions.filters.network.http_connection_manager.v3.HttpConnectionManager"
+          local_reply_config:
+            mappers:
+            - filter:
+                status_code_filter:
+                  comparison:
+                    op: EQ
+                    value:
+                      default_value: 403 # Replace to 401 if you want to customize for the JWT validation fail response
+                      runtime_key: placeholder
+              status_code: 403
+              body:
+                inline_string: Sorry, the page you're looking for cannot be accessed
+              body_format_override:
+                text_format: "<!DOCTYPE html><html lang=\"en\" ><head> <meta charset=\"UTF-8\"> <title>%RESPONSE_CODE% - Access Denined</title> <link rel=\"stylesheet\" href=\"https://cdnjs.cloudflare.com/ajax/libs/normalize/5.0.0/normalize.min.css\"> <link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/all.min.css'> <style>@import url(https://fonts.googleapis.com/css?family=Montserrat:400,400i,700);*,:after,:before{box-sizing:border-box}body{background-color:#313942;font-family:Montserrat,sans-serif}main{align-items:center;display:flex;flex-direction:column;height:100vh;justify-content:center;text-align:center}h1{color:#e7ebf2;font-size:12.5rem;letter-spacing:.1em;margin:.025em 0;text-shadow:.05em .05em 0 rgba(0,0,0,.25);white-space:nowrap}@media (max-width:30rem){h1{font-size:8.5rem}}h1>span{-webkit-animation:spooky 2s alternate infinite linear;animation:spooky 2s alternate infinite linear;color:#528cce;display:inline-block}h2{color:#e7ebf2;margin-bottom:.4em}p{color:#ccc;margin-top:0}@-webkit-keyframes spooky{from{transform:translatey(.15em) scaley(.95)}to{transform:translatey(-.15em)}}@keyframes spooky{from{transform:translatey(.15em) scaley(.95)}to{transform:translatey(-.15em)}}</style></head><body><main> <h1>4<span><i class=\"fas fa-ghost\"></i></span>3</h1> <h2>Error: %RESPONSE_CODE% %REQ(:path)% not found</h2> <p>%LOCAL_REPLY_BODY%</p></main></body></html>"
+                content_type: "text/html; charset=UTF-8"

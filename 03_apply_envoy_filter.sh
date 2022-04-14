@@ -1,0 +1,1 @@
+kubectl apply -f ./istio_envoy_filter/envoy-filter.yaml
