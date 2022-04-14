@@ -3,7 +3,7 @@
 Istio will return the following page if user does not pass AuthorizationPolicy
 ![Default Istio RBAC Eror](docs/images/istio_default_RBAC_error.png)\
 These white page is nice, but we would like to make it more beautiful ... like the below
-![Custom Istio RBAC Eror](docs/images/custom_RBAC_error.png)\
+![Custom Istio RBAC Eror](docs/images/custom_RBAC_error.png)
 
 ## Solution
 Implementing Envoy Filter, in status_code_filter. when status code is 403, use local reply to return customized page [Envoy Proxy - local_reply](https://www.envoyproxy.io/docs/envoy/latest/configuration/http/http_conn_man/local_reply)
