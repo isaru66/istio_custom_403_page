@@ -29,3 +29,11 @@ after apply all resources. access to http://127.0.0.1/headers
 ## HTML Template
 Thank for Amazing CodePen from Jake Wood
 https://codepen.io/Jake_Woods/pen/LYEMGpV
+
+## Building HTML Page
+In html folder, I have setup webpack builder to minified & inline CSS to inject into envoy proxy. the html/src will be compile into html/dist folder. Webpack can be compile using the following command. 
+```
+cd ./html
+npm install
+npm run build
+```
